@@ -3,44 +3,97 @@
 
 
 //variasveis globais
-int* c;
-float* a;
-int* contador_pessoas;
-contador_pessoas = 0;
 void* pBuffer;
-struct* pessoa;
+void* auxpBuffer;
 
 //elementos da agenda
 struct pessoa{
     char nome[20];
     int idade;
-    int telefone;
+    double telefone;
 };
+
+
+struct variaveis_usadas{
+	int i, j, k;
+	int aux, aux1, aux2;
+	double telefone_remove;
+	int contador_pessoas;
+	int contador_pessoas2;
+	struct pessoa* aux_pessoa;
+	int seletor;
+};
+
+
+
 //funcao que realloca o tamanho do pBuffer
-void change_size(){
+void change_size(struct variaveis_usadas* head){
 
-    pBuffer = (void*)realloc(pBuffer, sizeof(int)+sizeof(float)+(sizeof(struct pessoa)**contador_pessoas));
-    c = pBuffer;
-    a = c+1;
-    pessoa = a+1;
+    pBuffer = (void*)realloc(pBuffer, sizeof(struct variaveis_usadas)+(sizeof(struct pessoa)* head->contador_pessoas));
+    printf("changed size");
+    
+}
+
+void insere_pessoa(struct variaveis_usadas* head){
+
+	struct pessoa* aux;
+	head->contador_pessoas = head->contador_pessoas + 1;
+	change_size(head);
+	// a linha abaixo é descrita por: o ponteiro aux_pessoa para preencher os dados a serem inseridos, esse ponteiro aponta para o inicio e a partir dessa linha ele vai apontar parao ultimo elemento do pBuffer;
+	aux =  pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa) * (head->contador_pessoas - 1 )));
+	printf("\n insira o nome da pessoa: ");
+	//getchar();
+	scanf("%s", aux->nome);
+	printf("\n insira o número de telefone: ");
+	scanf("%lf", &aux->telefone);
+}
+
+void* find_person(struct variaveis_usadas* head){
+
+	head->contador_pessoas2 = 0;
+	struct pessoa* aux;
+	aux = pBuffer + sizeof(struct variaveis_usadas);
+	for (head->i = 0; head->i < head->contador_pessoas; head->i = head->i + 1)
+	{
+		if (aux->telefone == head->telefone_remove )
+		{
+			return aux;
+		}
+		contador_pessoas2++;
+		aux++;
+	}
+	return NULL;
 
 }
 
-void insere_pessoa(){
+void remove_pessoa(struct variaveis_usadas* head){
 
-    struct* pessoaAux = (struct* pessoa)malloc(sizeof(struct pessoa));
-
+	struct pessoa* aux;
+	printf("\ndigite o telefone da pessoa que quer remover: ");
+	scanf("%lf", &head->telefone_remove);
+	if((aux = find_person(head)) == NULL){
+		printf("\nPESSOA NAO ENCONTRADA");
+		else{
+			for (head->i = head->contador_pessoas2; head->i < head->contador_pessoas; head->i = head->i + 1)
+			{
+				//parei aqui, preciso copiar todas as proximas pessoas sobrepondo quem eu quero remover e depois dar realloc e cortar o final do pbuffer;
+			}
+		}
+	}
 
 }
 
-void remove_pessoa(){
 
+void lista_agenda(struct variaveis_usadas* head){
 
-
-
-}
-
-void lista_agenda(){
+	struct pessoa* aux;
+	aux = pBuffer + sizeof(struct variaveis_usadas);
+	for (head->i = 0; head->i < head->contador_pessoas; head->i = head->i + 1)
+	{
+		printf("\nPessoa  [%d]: %s", head->i, aux->nome);
+		printf("\ntelefone[%d]: %.0lf", head->i, aux->telefone);
+		aux++;
+	}
 
 
 }
@@ -49,28 +102,31 @@ void lista_agenda(){
 
 int main(){
 
-    int* seletor;
-    pBuffer = (void*)malloc(sizeof(int)+sizeof(float)+(sizeof(struct pessoa)**contador_pessoas));
+
+	struct variaveis_usadas* head;
+    pBuffer = (void*)malloc(sizeof(struct variaveis_usadas));
+	head = pBuffer;
+	head->contador_pessoas = 0;
 
     while(1){
         printf("\n-----------AGENDA----------\n");
         printf("1-Adicionar\n2-Remover\n3-Salvar\n4-Listar\n5-Sair\nDigite a opcao desejada: ");
-        scanf("%d", &seletor);
-            if(*seletor == 1){
-                insere_pessoa();
-                ++contador_pessoas;
+        scanf("%d", &head->seletor);
+            if(head->seletor == 1){
+               insere_pessoa(head);
+            	printf("\n Pessoa adicionada com sucesso");
             }
-            if(*seletor == 2){
-                remove_pessoa();
-                --contador_pessoas;
+            if(head->seletor == 2){
+            //  remove_pessoa(head);
+            //	change_size(head);
             }
-            if(*seletor == 3){
-                change_size();
+            if(head->seletor == 3){
+             //   change_size(head);
             }
-            if(*seletor == 4){
-                lista_agenda();
+            if(head->seletor == 4){
+                lista_agenda(head);
             }
-            if(*seletor == 5){
+            if(head->seletor == 5){
                 exit(1);
             }
 
