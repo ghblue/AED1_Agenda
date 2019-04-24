@@ -44,7 +44,7 @@ void insere_pessoa(struct variaveis_usadas* head){
 	printf("\n insira o nome da pessoa: ");
 	//getchar();
 	scanf("%s", aux->nome);
-	printf("\n insira o número de telefone: ");
+	printf(" insira o número de telefone: ");
 	scanf("%lf", &aux->telefone);
 }
 
@@ -59,7 +59,7 @@ void* find_person(struct variaveis_usadas* head){
 		{
 			return aux;
 		}
-		contador_pessoas2++;
+		head->contador_pessoas2++;
 		aux++;
 	}
 	return NULL;
@@ -69,19 +69,25 @@ void* find_person(struct variaveis_usadas* head){
 void remove_pessoa(struct variaveis_usadas* head){
 
 	struct pessoa* aux;
+	struct pessoa* aux_cursor;
 	printf("\ndigite o telefone da pessoa que quer remover: ");
 	scanf("%lf", &head->telefone_remove);
-	if((aux = find_person(head)) == NULL){
+	if((aux = (struct pessoa*)find_person(head)) == NULL){
 		printf("\nPESSOA NAO ENCONTRADA");
-		else{
+	}else{
 			for (head->i = head->contador_pessoas2; head->i < head->contador_pessoas; head->i = head->i + 1)
 			{
-				//parei aqui, preciso copiar todas as proximas pessoas sobrepondo quem eu quero remover e depois dar realloc e cortar o final do pbuffer;
+					if((aux_cursor = (struct pessoa*) aux + 1) == NULL){}
+					else{
+					aux = aux_cursor;
+					aux++;
+				}
 			}
+		head->contador_pessoas--;
 		}
 	}
 
-}
+
 
 
 void lista_agenda(struct variaveis_usadas* head){
@@ -117,8 +123,8 @@ int main(){
             	printf("\n Pessoa adicionada com sucesso");
             }
             if(head->seletor == 2){
-            //  remove_pessoa(head);
-            //	change_size(head);
+              remove_pessoa(head);
+            	change_size(head);
             }
             if(head->seletor == 3){
              //   change_size(head);
