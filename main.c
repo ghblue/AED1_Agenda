@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 //variasveis globais
@@ -33,6 +34,16 @@ void change_size(struct variaveis_usadas* head){
     printf("changed size");
     
 }
+
+void swap(int* a, int* b){
+
+	int* aux;
+	aux = a;
+	a = b;
+	b = aux;
+}
+
+
 void insetion_sort(struct variaveis_usadas* head){
 
 	struct pessoa* aux;
@@ -41,10 +52,10 @@ void insetion_sort(struct variaveis_usadas* head){
 	head->j = 0;
 	head->aux_idade = 0;
 	aux = pBuffer + sizeof(struct variaveis_usadas);
-	aux_do_aux = aux + 1;
+	aux_do_aux = aux + (1*sizeof(struct pessoa));
 		for (head->i = head->i+1; head->i < head->contador_pessoas; head->i = head->i + 1)
 		{
-			head->aux_idade = aux->idade;
+			//head->aux_idade = aux->idade;
 			head->j = head->i - 1;
 
 
@@ -66,7 +77,7 @@ void ordena(struct variaveis_usadas* head){
         scanf("%d", &head->seletor2);
             if(head->seletor2 == 1){
 				printf("\ninsertion_sort selecionado");
-				Insertion_sort(head);
+				//Insertion_sort(head);
 				printf("\ninsertion_sort concluido");
             }
             if(head->seletor2 == 2){
@@ -98,6 +109,7 @@ void insere_pessoa(struct variaveis_usadas* head){
 	scanf("%d", &aux->idade);
 	printf("insira o número de telefone: ");
 	scanf("%lf", &aux->telefone);
+	printf("Pessoa adicionada com sucesso");
 }
 
 void* find_person(struct variaveis_usadas* head){
@@ -122,20 +134,29 @@ void remove_pessoa(struct variaveis_usadas* head){
 
 	struct pessoa* aux;
 	struct pessoa* aux_cursor;
-	printf("\ndigite o telefone da pessoa que quer remover: ");
+	struct pessoa* aux_encontra_pessoa;
+	printf("digite o telefone da pessoa que quer remover: ");
 	scanf("%lf", &head->telefone_remove);
-	if((aux = (struct pessoa*)find_person(head)) == NULL){
-		printf("\nPESSOA NAO ENCONTRADA");
+	//chamada da função find_person para chegar na pessoa desejada
+	if((aux_encontra_pessoa = (struct pessoa*)find_person(head)) == NULL){
+		printf("PESSOA NAO ENCONTRADA\n");
 	}else{
+	//aux agora está na pessoa desejada e pronto para excluir-a
+	aux = pBuffer + sizeof(struct variaveis_usadas) + (head->contador_pessoas2 * sizeof(struct pessoa));
 			for (head->i = head->contador_pessoas2; head->i < head->contador_pessoas; head->i = head->i + 1)
 			{
-					if((aux_cursor = (struct pessoa*) aux + 1) == NULL){}
+					aux_cursor = (struct pessoa*) aux + 1;
+					if(aux_cursor == NULL){}
 					else{
-					aux = aux_cursor;
-					aux++;
+					strcpy(aux->nome, aux_cursor->nome);
+					aux->idade = aux_cursor->idade;
+					aux->telefone = aux_cursor->telefone;
+					aux + (1 * sizeof(struct pessoa));
 				}
 			}
 		head->contador_pessoas--;
+		printf("Pessoa removida com sucesso\n");
+		change_size(head);
 		}
 	}
 
@@ -153,7 +174,6 @@ void lista_agenda(struct variaveis_usadas* head){
 		printf("\ntelefone[%d]: %.0lf", head->i, aux->telefone);
 		aux++;
 	}
-
 
 }
 
@@ -173,11 +193,10 @@ int main(){
         scanf("%d", &head->seletor);
             if(head->seletor == 1){
                insere_pessoa(head);
-            	printf("\n Pessoa adicionada com sucesso");
             }
             if(head->seletor == 2){
               remove_pessoa(head);
-            	change_size(head);
+            	//change_size(head);
             }
             if(head->seletor == 3){
                	 ordena(head);
