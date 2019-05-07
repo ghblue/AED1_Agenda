@@ -9,7 +9,8 @@ void* auxpBuffer;
 
 //elementos da agenda
 struct pessoa{
-    char nome[20];
+	int tam_nome;
+    char *nome;
     int idade;
     double telefone;
 };
@@ -17,8 +18,9 @@ struct pessoa{
 
 struct variaveis_usadas{
 	int i, j, k;
-	int aux, aux1, aux_idade;
+	int aux, aux1, aux_idade, tam_nomes_total, tam_nomes_parcial, tam_nome_antigo, tam_printar;
 	double telefone_remove;
+	char nome_aux[20];
 	int contador_pessoas;
 	int contador_pessoas2;
 	struct pessoa* aux_pessoa;
@@ -29,25 +31,29 @@ struct variaveis_usadas{
 
 //funcao que realloca o tamanho do pBuffer
 void change_size(struct variaveis_usadas* head){
+	double x;
+	x = sizeof(struct variaveis_usadas)+(sizeof(struct pessoa)* head->contador_pessoas) + (head->tam_nomes_total * sizeof(char));
+	printf("%.3lf, %x\n", x, (unsigned)pBuffer);
 
-    pBuffer = (void*)realloc(pBuffer, sizeof(struct variaveis_usadas)+(sizeof(struct pessoa)* head->contador_pessoas));
-    printf("changed size");
+	void *aux = malloc(x*sizeof(char));
+	memcpy(aux,pBuffer,x);
+	free(pBuffer);
+	pBuffer = aux;
+	printf("%x\n",(unsigned)pBuffer);
+
+
+   // pBuffer = (void*)realloc(pBuffer, sizeof(struct variaveis_usadas)+(sizeof(struct pessoa)*head->contador_pessoas) + (head->tam_nomes_total * sizeof(char)));
+
+   // if(pBuffer == NULL) exit(0);
+
+    //printf("changed size\n");
     
 }
 
-void swap(int* a, int* b){
-
-	int* aux;
-	aux = a;
-	a = b;
-	b = aux;
-}
-
-
-void insetion_sort(struct variaveis_usadas* head){
-
+/*void insetion_sort(struct variaveis_usadas* head){
 	struct pessoa* aux;
 	struct pessoa* aux_do_aux;
+	struct pessoa* aux_temp = (struct pessoa*)malloc(sizeof(struct pessoa));
 	head->i = 0;
 	head->j = 0;
 	head->aux_idade = 0;
@@ -55,22 +61,10 @@ void insetion_sort(struct variaveis_usadas* head){
 	aux_do_aux = aux + (1*sizeof(struct pessoa));
 		for (head->i = head->i+1; head->i < head->contador_pessoas; head->i = head->i + 1)
 		{
-			//head->aux_idade = aux->idade;
 			head->j = head->i - 1;
-
-
-			/*for (head->j = head->i - 1; head->j >= 0; head->j = head->j - 1)
-			{
-				
-			}*/
 		}
-
-
-
-
 }
 void ordena(struct variaveis_usadas* head){
-
     while(1){
         printf("\n-----------Algoritmos de ordenação----------\n");
         printf("1-Insertion_sort\n2-Bubble_sort\n3-merge_sort\n4-bobo_sorte\n5-sair\nDigite a opcao desejada: ");
@@ -88,32 +82,40 @@ void ordena(struct variaveis_usadas* head){
             }
             if(head->seletor2 == 5){
             }
-
     }
-
-
-
-}
+}*/
 
 void insere_pessoa(struct variaveis_usadas* head){
 
-	struct pessoa* aux;
+	void* aux;
+
 	head->contador_pessoas = head->contador_pessoas + 1;
-	change_size(head);
-	// a linha abaixo é descrita por: o ponteiro aux_pessoa para preencher os dados a serem inseridos, esse ponteiro aponta para o inicio e a partir dessa linha ele vai apontar parao ultimo elemento do pBuffer;
-	aux =  pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa) * (head->contador_pessoas - 1 )));
-	printf("\ninsira o nome da pessoa: ");
-	//getchar();
-	scanf("%s", aux->nome);
+	printf("insira o nome da pessoa: ");
+	scanf("%s", head->nome_aux);
+	head->tam_nomes_parcial = head->tam_nomes_parcial + ((strlen(head->nome_aux)+1)*sizeof(char));
+	change_size(head);//reallocando o novo de acordo com o nome da pessoa inserida
+	if ((head->contador_pessoas - 1 ) == 0)
+	{
+	aux = (void*)pBuffer + (sizeof(struct variaveis_usadas));
+	}else{
+	aux = (void*)pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa) * (head->contador_pessoas - 1 )) + ((head->tam_nomes_total) * sizeof(char)));
+	}
+	//aux = pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa) * (head->contador_pessoas - 1 )) );
+	
+	((struct pessoa*)aux)->nome = (char*)(pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa)*(head->contador_pessoas) ) + (sizeof(char)*head->tam_nomes_total))  );
+	head->tam_nomes_total = head->tam_nomes_parcial;
+	strcpy(((struct pessoa*)aux)->nome,head->nome_aux);
+	((struct pessoa*)aux)->tam_nome = (strlen(head->nome_aux)+1);
 	printf("insira a idade da pessoa: ");
-	scanf("%d", &aux->idade);
+	scanf("%d", &((struct pessoa*)aux)->idade);
 	printf("insira o número de telefone: ");
-	scanf("%lf", &aux->telefone);
+	scanf("%lf", &((struct pessoa*)aux)->telefone);
 	printf("Pessoa adicionada com sucesso");
+	head->tam_nomes_parcial = head->tam_nomes_total;
+
 }
-
+/*
 void* find_person(struct variaveis_usadas* head){
-
 	head->contador_pessoas2 = 0;
 	struct pessoa* aux;
 	aux = pBuffer + sizeof(struct variaveis_usadas);
@@ -127,11 +129,8 @@ void* find_person(struct variaveis_usadas* head){
 		aux++;
 	}
 	return NULL;
-
 }
-
 void remove_pessoa(struct variaveis_usadas* head){
-
 	struct pessoa* aux;
 	struct pessoa* aux_cursor;
 	struct pessoa* aux_encontra_pessoa;
@@ -155,28 +154,31 @@ void remove_pessoa(struct variaveis_usadas* head){
 				}
 			}
 		head->contador_pessoas--;
-		printf("Pessoa removida com sucesso\n");
+		printf("Pessoa removida com sucesso");
 		change_size(head);
 		}
-	}
-
-
-
-
+}
+*/
 void lista_agenda(struct variaveis_usadas* head){
 
 	struct pessoa* aux;
-	aux = pBuffer + sizeof(struct variaveis_usadas);
+	aux = (void*)pBuffer + sizeof(struct variaveis_usadas);
+	((struct pessoa*)aux)->nome = (char*)(pBuffer + (sizeof(struct variaveis_usadas) + (sizeof(struct pessoa)) ) );
 	for (head->i = 0; head->i < head->contador_pessoas; head->i = head->i + 1)
 	{
 		printf("\nPessoa  [%d]: %s", head->i, aux->nome);
+		//printf("\ntam nome: %d", aux->tam_nome - 1);	
+		//aux->nome = aux->nome + (sizeof(struct pessoa)) + (aux->tam_nome * sizeof(char*));
 		printf("\nIdade   [%d]: %d", head->i, aux->idade);
 		printf("\ntelefone[%d]: %.0lf", head->i, aux->telefone);
-		aux++;
+		head->tam_nome_antigo = aux->tam_nome;
+		aux = (void*)aux + (sizeof(struct pessoa) + (sizeof(char) * aux->tam_nome) );
+		((struct pessoa*)aux)->nome = (void*)aux + (sizeof(struct pessoa));// - (sizeof(char)*head->tam_nome_antigo);
+		//aux->nome = (void*)aux->nome + (aux->tam_nome * sizeof(char)) + sizeof(struct pessoa);
+		head->tam_nome_antigo = 0;
 	}
 
 }
-
 
 
 int main(){
@@ -186,6 +188,10 @@ int main(){
     pBuffer = (void*)malloc(sizeof(struct variaveis_usadas));
 	head = pBuffer;
 	head->contador_pessoas = 0;
+	head->tam_nomes_total = 0;
+	head->tam_nomes_parcial = 0;
+	head->tam_nome_antigo = 0;
+  	memset(head->nome_aux, 0, 20);
 
     while(1){
         printf("\n-----------AGENDA----------\n");
@@ -195,14 +201,13 @@ int main(){
                insere_pessoa(head);
             }
             if(head->seletor == 2){
-              remove_pessoa(head);
-            	//change_size(head);
+            //  remove_pessoa(head);
             }
             if(head->seletor == 3){
-               	 ordena(head);
+             //  ordena(head);
             }
             if(head->seletor == 4){
-                lista_agenda(head);
+               lista_agenda(head);
             }
             if(head->seletor == 5){
                 exit(1);
